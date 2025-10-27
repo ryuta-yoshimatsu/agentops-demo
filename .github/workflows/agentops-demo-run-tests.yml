@@ -11,6 +11,7 @@ defaults:
     working-directory: ./agentops_demo/
 
 env:
+  DATABRICKS_HOST: ${{ secrets.STAGING_WORKSPACE_HOST }}
   DATABRICKS_TOKEN: ${{ secrets.STAGING_WORKSPACE_TOKEN }}
 
 concurrency: agentops_demo-training-integration-test-staging
