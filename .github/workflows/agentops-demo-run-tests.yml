@@ -1,0 +1,60 @@
+name: Training Unit and Integration Tests for agentops-demo
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'agentops_demo/**'
+      - '.github/workflows/agentops-demo-run-tests.yml'
+
+defaults:
+  run:
+    working-directory: ./agentops_demo/
+
+env:
+  DATABRICKS_TOKEN: ${{ secrets.STAGING_WORKSPACE_TOKEN }}
+
+concurrency: agentops_demo-training-integration-test-staging
+
+jobs:
+  unit_tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.12.3
+      - name: Install dependencies
+        run: |
+            python -m pip install --upgrade pip
+            pip install -r ../test-requirements.txt
+      - name: Run tests with pytest
+        run: |
+            pytest
+
+  integration_test:
+    needs: unit_tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      - uses: databricks/setup-cli@v0.256.0
+      - name: Validate Bundle For Test Deployment Target in Staging Workspace
+        id: validate
+        run: |
+          databricks bundle validate -t test
+      - name: Deploy Bundle to Test Deployment Target in Staging Workspace
+        id: deploy
+        run: |
+          databricks bundle deploy -t test
+      - name: Run Data Preprocessing Workflow for Test Deployment Target in Staging Workspace
+        id: data_preprocessing
+        run: |
+          databricks bundle run data_preprocessing_job -t test
+      - name: Run Agent Development Workflow for Test Deployment Target in Staging Workspace
+        id: agent_development
+        run: |
+          databricks bundle run agent_development_job -t test
+      - name: Run Agent Deployment Workflow for Test Deployment Target in Staging Workspace
+        id: agent_deployment
+        run: |
+          databricks bundle run app_deployment_job -t test
