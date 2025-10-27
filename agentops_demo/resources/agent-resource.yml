@@ -16,13 +16,13 @@ resources:
           notebook_task:
             notebook_path: ../agent_development/agent/notebooks/Agent.py
             base_parameters:
-              uc_catalog: ${var.uc_catalog}
+              uc_catalog: ${var.uc_catalog}_${bundle.target}
               schema: ${var.schema}
               vector_search_endpoint: ${var.vector_search_endpoint}
               vector_search_index: ${var.vector_search_index}
-              experiment: ${var.experiment}
+              experiment: ${var.experiment}_${bundle.target}
               registered_model: ${var.registered_model}
-              agent_model_endpoint: ${var.agent_model_endpoint}
+              agent_model_endpoint: ${var.agent_model_endpoint}_${bundle.target}
               max_words: ${var.max_words}
               model_alias: ${var.model_alias}
               # git source information of current ML resource deployment. It will be persisted as part of the workflow run
@@ -35,9 +35,9 @@ resources:
           notebook_task:
             notebook_path: ../agent_development/agent_evaluation/notebooks/AgentEvaluation.py
             base_parameters:
-              uc_catalog: ${var.uc_catalog}
+              uc_catalog: ${var.uc_catalog}_${bundle.target}
               schema: ${var.schema}
-              experiment: ${var.experiment}
+              experiment: ${var.experiment}_${bundle.target}
               registered_model: ${var.registered_model}
               eval_table: ${var.eval_table}
               model_alias: ${var.model_alias}
@@ -51,7 +51,7 @@ resources:
           notebook_task:
             notebook_path: ../agent_deployment/model_serving/notebooks/ModelServing.py
             base_parameters:
-              uc_catalog: ${var.uc_catalog}
+              uc_catalog: ${var.uc_catalog}_${bundle.target}
               schema: ${var.schema}
               registered_model: ${var.registered_model}
               model_alias: ${var.model_alias}

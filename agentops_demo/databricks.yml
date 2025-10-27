@@ -5,7 +5,7 @@ bundle:
 variables:
   uc_catalog:
     description: Unity Catalog used to store data and artifacts.
-    default: agentops_stacks_ryuta
+    default: agentops_stacks
   schema: 
     description: "Schema in Unity Catalog."
     default: agentops

@@ -16,25 +16,25 @@ resources:
   registered_models:
       model:
         name: ${var.registered_model}
-        catalog_name: ${var.uc_catalog}
+        catalog_name: ${var.uc_catalog}_${bundle.target}
         schema_name: ${var.schema}
         comment: Registered model in Unity Catalog for the "mlops-example-project" ML Project for ${bundle.target} deployment target.
         <<: *grants
       
       feedback_model: 
         name: feedback
-        catalog_name: ${var.uc_catalog}
+        catalog_name: ${var.uc_catalog}_${bundle.target}
         schema_name: ${var.schema}
         comment: Registered model for the agent's feedback for ${bundle.target} deployment target.
         <<: *grants
 
   experiments:
     experiment:
-      name: ${var.experiment}
+      name: ${var.experiment}_${bundle.target}
       <<: *permissions
 
   apps:
     dash-chatbot-app:
-      name: ${var.chatbot_name}
+      name: ${var.chatbot_name}-${bundle.target}
       source_code_path: /Users/${workspace.current_user.userName}/.bundle/my_agent_project/${bundle.target}/files/agent_deployment/chat_interface_deployment/
       description: 'your Databricks assistant app.'
