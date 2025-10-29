@@ -31,7 +31,7 @@ resources:
       environments:
         - environment_key: app_requirements
           spec:
-            environment_version: "3"
+            client: "3"
             dependencies: 
               - "-r /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}/files/agent_deployment/app_requirements.txt"
 
