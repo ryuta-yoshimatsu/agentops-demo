@@ -3,7 +3,7 @@ This sample module contains data preprocessing logic to chunk HTML text.
 You should plug in your own data chunking logic in the split_html_on_p method below.
 """
 
-from langchain.text_splitter import (
+from langchain_text_splitters import (
     HTMLHeaderTextSplitter,
     RecursiveCharacterTextSplitter,
 )

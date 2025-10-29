@@ -14,18 +14,27 @@ resources:
       tasks:
         - task_key: AppDeployment
           notebook_task:
-            notebook_path: ../agent_deployment/chat_interface_deployment/LaunchApp.py
+            notebook_path: ../agent_deployment/chat_interface_deployment/notebooks/LaunchApp.py
             base_parameters:
               uc_catalog: ${var.uc_catalog}_${bundle.target}
               schema: ${var.schema}
               registered_model: ${var.registered_model}
-              agent_model_endpoint: ${var.agent_model_endpoint}_${bundle.target}
+              agent_model_endpoint: ${var.agent_model_endpoint}
               app_name: ${var.chatbot_name}-${bundle.target}
               # git source information of current ML resource deployment. It will be persisted as part of the workflow run
               git_source_info: url:${bundle.git.origin_url}; branch:${bundle.git.branch}; commit:${bundle.git.commit}
+          environment_key: app_requirements
       schedule:
         quartz_cron_expression: "0 0 8 * * ?" # daily at 8am
         timezone_id: UTC
+
+      environments:
+        - environment_key: app_requirements
+          spec:
+            environment_version: "3"
+            dependencies: 
+              - "-r /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}/files/agent_deployment/app_requirements.txt"
+
       <<: *permissions
       # If you want to turn on notifications for this job, please uncomment the below code,
       # and provide a list of emails to the on_failure argument.

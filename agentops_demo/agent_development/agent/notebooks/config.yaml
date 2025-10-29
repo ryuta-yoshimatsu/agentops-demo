@@ -1,0 +1,4 @@
+schema: agentops
+uc_catalog: agentops_stacks_dev
+vector_search_endpoint: ai_agent_endpoint
+vector_search_index: agentops_stacks_dev.agentops.databricks_documentation_vs_index

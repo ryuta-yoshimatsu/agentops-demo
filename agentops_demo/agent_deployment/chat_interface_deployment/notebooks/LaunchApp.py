@@ -1,5 +1,6 @@
 # Databricks notebook source
-# MAGIC %pip install -qqqq pyyaml databricks-agents databricks-sdk==0.49.0
+#%pip install -r ../../app_requirements.txt
+#dbutils.library.restartPython()
 
 # COMMAND ----------
 
@@ -9,13 +10,13 @@
 # A Unity Catalog containing the model
 dbutils.widgets.text(
     "uc_catalog",
-    "ai_agent_stacks",
+    "agentops_stacks_dev",
     label="Unity Catalog",
 )
 # Name of schema
 dbutils.widgets.text(
     "schema",
-    "ai_agent_ops",
+    "agentops",
     label="Schema",
 )
 # Name of model registered in mlflow
@@ -27,7 +28,7 @@ dbutils.widgets.text(
 # Name of the Databricks App
 dbutils.widgets.text(
     "app_name",
-    "dash-chatbot-app",
+    "dash-chatbot-app-dev",
     label="App Name",
 )
 # Name of the Agent Model Endpoint
@@ -36,10 +37,6 @@ dbutils.widgets.text(
     "databricks-meta-llama-3-3-70b-instruct",
     label="Agent Model Endpoint",
 )
-
-# COMMAND ----------
-
-dbutils.library.restartPython()
 
 # COMMAND ----------
 
@@ -431,3 +428,7 @@ deployment = AppDeployment(
 
 app_details = w.apps.deploy_and_wait(app_name=app_name, app_deployment=deployment)
 print(app_details)
+
+# COMMAND ----------
+
+

@@ -22,7 +22,7 @@ resources:
               vector_search_index: ${var.vector_search_index}
               experiment: ${var.experiment}_${bundle.target}
               registered_model: ${var.registered_model}
-              agent_model_endpoint: ${var.agent_model_endpoint}_${bundle.target}
+              agent_model_endpoint: ${var.agent_model_endpoint}
               max_words: ${var.max_words}
               model_alias: ${var.model_alias}
               # git source information of current ML resource deployment. It will be persisted as part of the workflow run
@@ -68,7 +68,7 @@ resources:
       environments:
         - environment_key: agent_requirements
           spec:
-            client: "3"
+            environment_version: "3"
             dependencies: 
               - "-r /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}/files/agent_development/agent_requirements.txt"
 

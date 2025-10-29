@@ -36,5 +36,5 @@ resources:
   apps:
     dash-chatbot-app:
       name: ${var.chatbot_name}-${bundle.target}
-      source_code_path: /Users/${workspace.current_user.userName}/.bundle/my_agent_project/${bundle.target}/files/agent_deployment/chat_interface_deployment/
+      source_code_path: /Users/${workspace.current_user.userName}/.bundle/my_agent_project/${bundle.target}/files/agent_deployment/chat_interface_deployment/notebooks/
       description: 'your Databricks assistant app.'
