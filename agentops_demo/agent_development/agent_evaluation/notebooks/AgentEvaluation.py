@@ -1,4 +1,9 @@
 # Databricks notebook source
+#%pip install -r ../../agent_requirements.txt
+#dbutils.library.restartPython()
+
+# COMMAND ----------
+
 # MAGIC %load_ext autoreload
 # MAGIC %autoreload 2
 # MAGIC # Enables autoreload; learn more at https://docs.databricks.com/en/files/workspace-modules.html#autoreload-for-python-modules
@@ -44,13 +49,13 @@
 # A Unity Catalog containing the model
 dbutils.widgets.text(
     "uc_catalog",
-    "ai_agent_stacks",
+    "agentops_stacks_dev",
     label="Unity Catalog",
 )
 # Name of schema
 dbutils.widgets.text(
     "schema",
-    "ai_agent_ops",
+    "agentops",
     label="Schema",
 )
 # Name of evaluation table
@@ -62,7 +67,7 @@ dbutils.widgets.text(
 # Name of experiment to register under in mlflow
 dbutils.widgets.text(
     "experiment",
-    "agent_function_chatbot",
+    "agent_function_chatbot_dev",
     label="Experiment name",
 )
 # Name of model registered in mlflow
@@ -102,6 +107,10 @@ assert registered_model != "", "registered_model notebook parameter must be spec
 assert model_alias != "", "model_alias notebook parameter must be specified"
 assert bundle_root != "", "bundle_root notebook parameter must be specified"
 
+# Updating to bundle root
+import sys 
+sys.path.append(bundle_root)
+
 # COMMAND ----------
 
 # DBTITLE 1,Create Evaluation Dataset
@@ -122,7 +131,7 @@ print(f"Evaluation dataset: {uc_catalog}.{schema}.{eval_table}")
 # COMMAND ----------
 
 # DBTITLE 1,Get Reference Documentation
-from agent_development.agent_evaluation.evaluation import get_reference_documentation
+from agent_development.agent_evaluation.evaluation.evaluation import get_reference_documentation
 
 reference_docs = get_reference_documentation(uc_catalog, schema, eval_table, spark)
 
@@ -147,6 +156,7 @@ print(f"Inputs: {sample['inputs']}")
 import mlflow 
 from mlflow.genai.scorers import scorer
 from mlflow.genai.scorers import RetrievalRelevance, RetrievalGroundedness
+from pyspark.sql.functions import session_user
 import re
 
 # Workaround for serverless compatibility
@@ -156,7 +166,10 @@ model = mlflow.pyfunc.load_model(f"models:/{uc_catalog}.{schema}.{registered_mod
 def evaluate_model(question):
     return model.predict({"messages": [{"role": "user", "content": question}]})
 
+user_name = spark.range(1).select(session_user()).collect()[0][0]
+
 mlflow.set_experiment(experiment)
+
 
 with mlflow.start_run():
     # Evaluate the logged model

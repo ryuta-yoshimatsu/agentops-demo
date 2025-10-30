@@ -1,4 +1,9 @@
 # Databricks notebook source
+#%pip install -r /Workspace/Users/ryuta.yoshimatsu@databricks.com/agentops-demo/agentops_demo/agent_development/agent_requirements.txt
+dbutils.library.restartPython()
+
+# COMMAND ----------
+
 # MAGIC %load_ext autoreload
 # MAGIC %autoreload 2
 # MAGIC # Enables autoreload; learn more at https://docs.databricks.com/en/files/workspace-modules.html#autoreload-for-python-modules
@@ -47,13 +52,13 @@
 # A Unity Catalog containing the model
 dbutils.widgets.text(
     "uc_catalog",
-    "ai_agent_stacks",
+    "agentops_stacks_dev",
     label="Unity Catalog",
 )
 # Name of schema
 dbutils.widgets.text(
     "schema",
-    "ai_agent_ops",
+    "agentops",
     label="Schema",
 )
 # Name of model registered in mlflow
@@ -109,6 +114,7 @@ root = dbutils.widgets.get("bundle_root")
 sys.path.append(root)
 
 # COMMAND ----------
+
 # DBTITLE 1,Review Instructions
 instructions_to_reviewer = f"""### Instructions for Testing the our Chatbot assistant
 
@@ -128,8 +134,8 @@ Your inputs are invaluable for the development team. By providing detailed feedb
 Thank you for your time and effort in testing our assistant. Your contributions are essential to delivering a high-quality product to our end users."""
 
 # COMMAND ----------
-# DBTITLE 1,Create agent deployment
 
+# DBTITLE 1,Create agent deployment
 from databricks import agents
 from mlflow import MlflowClient
 
@@ -151,10 +157,9 @@ else:
 agents.set_review_instructions(model_name, instructions_to_reviewer)
 
 # COMMAND ----------
-# DBTITLE 1, Wait for model serving endpoint to be ready
 
 # DBTITLE 1,Test Endpoint
-from agent_deployment.model_serving.serving import wait_for_model_serving_endpoint_to_be_ready
+from agent_deployment.model_serving.serving.serving import wait_for_model_serving_endpoint_to_be_ready
 wait_for_model_serving_endpoint_to_be_ready(deployment_info.endpoint_name)
 
 # COMMAND ----------
@@ -170,8 +175,8 @@ wait_for_model_serving_endpoint_to_be_ready(deployment_info.endpoint_name)
 # print(f"Share this URL with your stakeholders: {deployment_info.review_app_url}")
 
 # COMMAND ----------
-# DBTITLE 1,Test endpoint
 
+# DBTITLE 1,Test endpoint
 from mlflow.deployments import get_deploy_client
 
 client = get_deploy_client()

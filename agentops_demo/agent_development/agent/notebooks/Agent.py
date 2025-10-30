@@ -1,4 +1,9 @@
 # Databricks notebook source
+#%pip install -r ../../agent_requirements.txt
+#dbutils.library.restartPython()
+
+# COMMAND ----------
+
 # MAGIC %load_ext autoreload
 # MAGIC %autoreload 2
 # MAGIC # Enables autoreload; learn more at https://docs.databricks.com/en/files/workspace-modules.html#autoreload-for-python-modules
@@ -50,13 +55,13 @@
 # A Unity Catalog containing the preprocessed data
 dbutils.widgets.text(
     "uc_catalog",
-    "ai_agent_stacks",
+    "agentops_stacks_dev",
     label="Unity Catalog",
 )
 # Name of schema
 dbutils.widgets.text(
     "schema",
-    "ai_agent_ops",
+    "agentops",
     label="Schema",
 )
 # Name of vector search endpoint containing the preprocessed index
@@ -80,7 +85,7 @@ dbutils.widgets.text(
 # Name of experiment to register under in mlflow
 dbutils.widgets.text(
     "experiment",
-    "agent_function_chatbot",
+    "agent_function_chatbot_dev",
     label="Experiment name",
 )
 # Name of model to register in mlflow
@@ -148,11 +153,10 @@ client = DatabricksFunctionClient()
 # sets the default uc function client
 set_uc_function_client(client)
 
-
 # COMMAND ----------
 
 # DBTITLE 1,Function: execute_python_code
-from agent_development.agent.tools import execute_python_code
+from agent_development.agent.tools.ai_tools import execute_python_code
 
 function_info = client.create_python_function(
     func=execute_python_code, catalog=uc_catalog, schema=schema, replace=True
@@ -165,7 +169,7 @@ client.execute_function(python_execution_function_name, {"code": "print(1+1)"})
 # COMMAND ----------
 
 # DBTITLE 1,Function: ai_function_name_sql
-from agent_development.agent.tools import ask_ai_function
+from agent_development.agent.tools.ai_tools import ask_ai_function
 
 ask_ai_function_name = f"{uc_catalog}.{schema}.ask_ai"
 
@@ -176,7 +180,7 @@ result.value
 # COMMAND ----------
 
 # DBTITLE 1,Function: summarization_function
-from agent_development.agent.tools import summarization_function
+from agent_development.agent.tools.ai_tools import summarization_function
 
 summarization_function_name = f"{uc_catalog}.{schema}.summarize"
 
@@ -187,7 +191,7 @@ client.execute_function(summarization_function_name, {"text": result.value, "max
 # COMMAND ----------
 
 # DBTITLE 1,Function: translate_function
-from agent_development.agent.tools import translate_function
+from agent_development.agent.tools.ai_tools import translate_function
 
 translate_function_name = f"{uc_catalog}.{schema}.translate"
 
@@ -216,7 +220,8 @@ uc_tools
 # COMMAND ----------
 
 # DBTITLE 1,Import retriever_function
-from ai_tools import retrieve_function
+import os
+from agent_development.agent.tools.ai_tools import retrieve_function
 
 os.environ["UC_CATALOG"] = uc_catalog # Set these before function execution
 os.environ["SCHEMA"] = schema
@@ -227,7 +232,6 @@ os.environ["VECTOR_SEARCH_INDEX"] = vector_search_index
 # COMMAND ----------
 
 # DBTITLE 1,Initialize MLflow
-import os
 import mlflow
 
 mlflow.langchain.autolog()
@@ -388,8 +392,12 @@ final_state["messages"][-1].get('content')
 # MAGIC     ChatContext,
 # MAGIC )
 # MAGIC
-# MAGIC uc_catalog = "agentops_stacks_ryuta"
-# MAGIC schema = "agentops"
+# MAGIC ## Load the agent's configuration
+# MAGIC model_config = mlflow.models.ModelConfig(development_config="config.yaml")
+# MAGIC
+# MAGIC uc_catalog = model_config.get("uc_catalog")
+# MAGIC schema = model_config.get("schema")
+# MAGIC vector_search_index = model_config.get("vector_search_index")
 # MAGIC
 # MAGIC python_execution_function_name = f"{uc_catalog}.{schema}.execute_python_code"
 # MAGIC ask_ai_function_name = f"{uc_catalog}.{schema}.ask_ai"
@@ -400,7 +408,7 @@ final_state["messages"][-1].get('content')
 # MAGIC def retrieve_function(query: str) -> str:
 # MAGIC     """Retrieve from Databricks Vector Search using the query."""
 # MAGIC
-# MAGIC     index = f"{uc_catalog}.{schema}.databricks_documentation_vs_index"
+# MAGIC     index = f"{uc_catalog}.{schema}.{vector_search_index}"
 # MAGIC
 # MAGIC     vs_tool = VectorSearchRetrieverTool(
 # MAGIC         index_name=index,
@@ -510,9 +518,26 @@ final_state["messages"][-1].get('content')
 
 # COMMAND ----------
 
+import yaml
+
+agent_config = {
+    "uc_catalog": uc_catalog,
+    "schema": schema,
+    "vector_search_endpoint": vector_search_endpoint,
+    "vector_search_index": f"{uc_catalog}.{schema}.{vector_search_index}",
+}
+
+with open("config.yaml", "w") as f:
+    yaml.dump(agent_config, f)
+
+# COMMAND ----------
+
 import mlflow
 from mlflow.models.resources import DatabricksFunction, DatabricksServingEndpoint, DatabricksVectorSearchIndex
 from pkg_resources import get_distribution
+from pyspark.sql.functions import session_user
+
+user_name = spark.range(1).select(session_user()).collect()[0][0]
 
 mlflow.set_experiment(experiment)
 
@@ -528,6 +553,7 @@ resources = [
 with mlflow.start_run():
     model_info = mlflow.pyfunc.log_model(
         python_model="../notebooks/app.py", # Pass the path to the saved model file
+        model_config="../notebooks/config.yaml", # Agent configuration 
         name="model",
         resources=resources, 
         pip_requirements=[

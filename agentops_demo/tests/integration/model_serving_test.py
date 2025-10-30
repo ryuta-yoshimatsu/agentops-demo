@@ -14,7 +14,7 @@ def test_messages():
 
 def test_endpoint_returns_response(workspace_client, test_messages):
     #TODO Replace with your actual endpoint name
-    ENDPOINT_NAME = "endpoint_name"  
+    ENDPOINT_NAME = "databricks-meta-llama-3-3-70b-instruct"  
     
     response = workspace_client.serving_endpoints.query(
         name=ENDPOINT_NAME,

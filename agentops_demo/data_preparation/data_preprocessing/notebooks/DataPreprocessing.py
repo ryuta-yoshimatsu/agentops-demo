@@ -1,4 +1,9 @@
 # Databricks notebook source
+#%pip install -r ../../data_prep_requirements.txt
+#dbutils.library.restartPython()
+
+# COMMAND ----------
+
 # MAGIC %load_ext autoreload
 # MAGIC %autoreload 2
 # MAGIC # Enables autoreload; learn more at https://docs.databricks.com/en/files/workspace-modules.html#autoreload-for-python-modules
@@ -49,13 +54,13 @@
 # A Unity Catalog containing the input data
 dbutils.widgets.text(
     "uc_catalog",
-    "ai_agent_stacks",
+    "agentops_stacks_dev",
     label="Unity Catalog",
 )
 # Name of schema
 dbutils.widgets.text(
     "schema",
-    "ai_agent_ops",
+    "agentops",
     label="Schema",
 )
 # Name of input table

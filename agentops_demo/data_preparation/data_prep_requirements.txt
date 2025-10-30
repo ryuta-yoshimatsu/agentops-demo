@@ -1,0 +1,7 @@
+bs4
+transformers==4.57.1
+langchain==0.2.17
+langchain-text-splitters==0.2.0
+lxml==6.0.2
+databricks-sdk
+databricks-vectorsearch
