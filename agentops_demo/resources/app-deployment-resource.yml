@@ -14,7 +14,7 @@ resources:
       tasks:
         - task_key: AppDeployment
           notebook_task:
-            notebook_path: ../agent_deployment/chat_interface_deployment/notebooks/LaunchApp.py
+            notebook_path: ../agent_deployment/chat_interface_deployment/notebooks/LaunchApp.ipynb
             base_parameters:
               uc_catalog: ${var.uc_catalog}_${bundle.target}
               schema: ${var.schema}
@@ -24,9 +24,9 @@ resources:
               # git source information of current ML resource deployment. It will be persisted as part of the workflow run
               git_source_info: url:${bundle.git.origin_url}; branch:${bundle.git.branch}; commit:${bundle.git.commit}
           environment_key: app_requirements
-      schedule:
-        quartz_cron_expression: "0 0 8 * * ?" # daily at 8am
-        timezone_id: UTC
+      #schedule:
+      #  quartz_cron_expression: "0 0 8 * * ?" # daily at 8am
+      #  timezone_id: UTC
 
       environments:
         - environment_key: app_requirements
