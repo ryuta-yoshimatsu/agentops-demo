@@ -14,7 +14,7 @@ resources:
       tasks:
         - task_key: RawDataIngest
           notebook_task:
-            notebook_path: ../data_preparation/data_ingestion/notebooks/DataIngestion.py
+            notebook_path: ../data_preparation/data_ingestion/notebooks/DataIngestion.ipynb
             base_parameters:
               # TODO modify these arguments to reflect your setup.
               uc_catalog: ${var.uc_catalog}_${bundle.target}
@@ -29,7 +29,7 @@ resources:
           depends_on:
             - task_key: RawDataIngest
           notebook_task:
-            notebook_path: ../data_preparation/data_preprocessing/notebooks/DataPreprocessing.py
+            notebook_path: ../data_preparation/data_preprocessing/notebooks/DataPreprocessing.ipynb
             base_parameters:
               # TODO modify these arguments to reflect your setup.
               uc_catalog: ${var.uc_catalog}_${bundle.target}
@@ -48,7 +48,7 @@ resources:
           depends_on:
             - task_key: PreprocessRawData
           notebook_task:
-            notebook_path: ../data_preparation/vector_search/notebooks/VectorSearch.py
+            notebook_path: ../data_preparation/vector_search/notebooks/VectorSearch.ipynb
             base_parameters:
               # TODO modify these arguments to reflect your setup.
               uc_catalog: ${var.uc_catalog}_${bundle.target}
@@ -66,9 +66,9 @@ resources:
             dependencies: 
               - "-r /Workspace/Users/${workspace.current_user.userName}/.bundle/${bundle.name}/${bundle.target}/files/data_preparation/data_prep_requirements.txt"
 
-      schedule:
-        quartz_cron_expression: "0 0 5 * * ?" # daily at 5am
-        timezone_id: UTC
+      #schedule:
+      #  quartz_cron_expression: "0 0 5 * * ?" # daily at 5am
+      #  timezone_id: UTC
       <<: *permissions
       # If you want to turn on notifications for this job, please uncomment the below code,
       # and provide a list of emails to the on_failure argument.
