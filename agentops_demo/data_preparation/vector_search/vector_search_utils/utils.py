@@ -6,10 +6,10 @@ def vs_endpoint_exists(vsc, endpoint_name):
         vsc.get_endpoint(endpoint_name)
         return True
     except Exception as e:
-        if 'Not Found' in str(e):
-            print(f'Unexpected error describing the endpoint. Try deleting it? vsc.delete_endpoint({endpoint_name}) and rerun the previous cell')
-            raise e
-        return False
+        if 'Not Found' in str(e) or 'NOT_FOUND' in str(e):
+            return False
+        print(f'Unexpected error describing the endpoint: {e}')
+        raise e
     
 def wait_for_vs_endpoint_to_be_ready(vsc, vs_endpoint_name):
   for i in range(180):
@@ -31,10 +31,11 @@ def index_exists(vsc, endpoint_name, index_full_name):
         vsc.get_index(endpoint_name, index_full_name).describe()
         return True
     except Exception as e:
-        if 'RESOURCE_DOES_NOT_EXIST' not in str(e):
-            print(f'Unexpected error describing the index. This could be a permission issue. Try deleting it? vsc.delete_index({index_full_name})')
-            raise e
-        return False
+        # Handle both index not existing and endpoint not existing
+        if 'RESOURCE_DOES_NOT_EXIST' in str(e) or 'NOT_FOUND' in str(e):
+            return False
+        print(f'Unexpected error describing the index. This could be a permission issue. Try deleting it? vsc.delete_index({index_full_name})')
+        raise e
     
 def wait_for_index_to_be_ready(vsc, vs_endpoint_name, index_name):
   for i in range(180):

@@ -47,7 +47,7 @@ variables:
     default: 20
   agent_model_endpoint:
     description: "Foundation model endpoint to use for agent."
-    default: "databricks-gpt-5"
+    default: "databricks-gpt-5-1"
   eval_table:
     description: "Table in Unity Catalog to store evaluation data."
     default: "databricks_documentation_eval"
